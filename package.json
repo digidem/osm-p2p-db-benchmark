@@ -1,0 +1,24 @@
+{
+  "name": "osm-p2p-db-benchmark",
+  "version": "1.0.0",
+  "description": "A performance benchmarking suite for osm-p2p-db.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://www.github.com/digidem/osm-p2p-db-benchmark.git"
+  },
+  "keywords": [
+    "osm",
+    "osm-p2p",
+    "osm-p2p-db",
+    "benchmark",
+    "perf",
+    "performance",
+    "openstreetmap"
+  ],
+  "author": "Stephen Whitmore <sww@eight45.net>",
+  "license": "ISC"
+}
