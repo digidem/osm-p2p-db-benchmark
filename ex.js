@@ -1,6 +1,7 @@
 var benchmark = require('.')
 // var level = wrapLevel(require('level'))
 var memdb = require('memdb')
+var fdchunk = require('fd-chunk-store')
 var rimraf = require('rimraf')
 
 var dbs = []
@@ -20,7 +21,7 @@ function cleanup () {
   })
 }
 
-benchmark(memdb, function (err, res) {
+benchmark(memdb, fdchunk, function (err, res) {
   console.log(err ? err : res)
   cleanup()
 })

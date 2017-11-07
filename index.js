@@ -12,20 +12,20 @@ var level = function (name) {
   return levelup(name, { db: leveldown })
 }
 
-function benchmark (level, cb) {
-  var timer = createPerfTimer()
+function benchmark (level, chunk, cb) {
+  var timer = createPerfTimer(level, chunk)
   var res = []
 
   var osm = osmdb({
     log: hyperlog(level('log1'), { valueEncoding: 'json' }),
     db: level('index1'),
-    store: fdstore(4096, 'kdb1')
+    store: chunk(4096, 'kdb1')
   })
 
   var osm2 = osmdb({
     log: hyperlog(level('log2'), { valueEncoding: 'json' }),
     db: level('index2'),
-    store: fdstore(4096, 'kdb2')
+    store: chunk(4096, 'kdb2')
   })
 
   timer.start('insert')
