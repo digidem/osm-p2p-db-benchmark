@@ -1,0 +1,27 @@
+var benchmark = require('.')
+// var level = wrapLevel(require('level'))
+var memdb = require('memdb')
+var rimraf = require('rimraf')
+
+var dbs = []
+function wrapLevel (level) {
+  return function (name) {
+    dbs.push(name)
+    return level(name)
+  }
+}
+
+function cleanup () {
+  console.log('cleanup')
+  dbs.forEach(function (db) {
+    console.log('rimraffing', db)
+    rimraf.sync(db)
+    console.log('rimraffed', db)
+  })
+}
+
+benchmark(memdb, function (err, res) {
+  console.log(err ? err : res)
+  cleanup()
+})
+
