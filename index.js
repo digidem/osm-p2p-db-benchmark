@@ -1,16 +1,8 @@
 var hyperlog = require('hyperlog')
-var levelup = require('levelup')
-var leveldown = require('memdown')
 var osmdb = require('osm-p2p-db')
-var fdstore = require('fd-chunk-store')
-var rimraf = require('rimraf')
 var createPerfTimer = require('./lib/app_timer')
 
 module.exports = benchmark
-
-var level = function (name) {
-  return levelup(name, { db: leveldown })
-}
 
 function benchmark (level, chunk, cb) {
   var timer = createPerfTimer(level, chunk)
