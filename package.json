@@ -19,6 +19,10 @@
     "performance",
     "openstreetmap"
   ],
+  "dependencies": {
+    "hyperlog": "^4.12.1",
+    "osm-p2p-db": "^4.2.5"
+  },
   "author": "Stephen Whitmore <sww@eight45.net>",
-  "license": "ISC"
+  "license": "ISC",
 }
