@@ -21,7 +21,7 @@ function cleanup () {
   })
 }
 
-benchmark(memdb, fdchunk, function (err, res) {
+benchmark(memdb, fdchunk, { n: 200 }, function (err, res) {
   console.log(err ? err : res)
   cleanup()
 })

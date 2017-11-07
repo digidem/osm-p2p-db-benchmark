@@ -4,7 +4,12 @@ var createPerfTimer = require('./lib/app_timer')
 
 module.exports = benchmark
 
-function benchmark (level, chunk, cb) {
+function benchmark (level, chunk, opts, cb) {
+  if (typeof opts == 'function') {
+    cb = opts
+    opts = {}
+  }
+
   var timer = createPerfTimer(level, chunk)
   var res = []
 
@@ -22,8 +27,8 @@ function benchmark (level, chunk, cb) {
 
   timer.start('insert')
   var batch = []
-  var n = 100
-  console.log('inserting', n, 'documents')
+  var n = opts.n || 100
+  console.error('inserting', n, 'documents')
   for (var i=0; i < n; i++) {
     var node = {
       type: 'node',

@@ -37,11 +37,15 @@ outputs
 var benchmark = require('osm-p2p-db-benchmark')
 ```
 
-### benchmark(level, chunk, cb)
+### benchmark(level, chunk[, opts], cb)
 
 Runs the benchmarking suite with the Level backend `level` and abstract chunk
 store `chunk`. `cb` is called with `(err, res)`, where `res` are the timing
 results shown in the above example output.
+
+Valid `opts` include:
+
+- `n` (Number): the number of nodes to insert to benchmark against
 
 ## License
 
