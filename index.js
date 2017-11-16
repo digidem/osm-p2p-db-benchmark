@@ -45,16 +45,28 @@ function benchmark (level, chunk, opts, cb) {
     osm.ready(function () {
       res.push(timer.end())
 
-      timer.start('query')
-      osm.query([[-90,90],[-180,180]], function (err) {
+      timer.start('small-query')
+      osm.query([[-10,10],[-20,20]], function (err) {
         if (err) throw err
         res.push(timer.end())
 
-        timer.start('replicate')
-        replicate(function () {
+        timer.start('medium-query')
+        osm.query([[-45,45],[-90,90]], function (err) {
+          if (err) throw err
           res.push(timer.end())
-          res.push(timer.total())
-          cb(null, res)
+
+          timer.start('full-query')
+          osm.query([[-90,90],[-180,180]], function (err) {
+            if (err) throw err
+            res.push(timer.end())
+
+            timer.start('replicate')
+            replicate(function () {
+              res.push(timer.end())
+              res.push(timer.total())
+              cb(null, res)
+            })
+          })
         })
       })
     })
