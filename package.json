@@ -21,6 +21,7 @@
   ],
   "dependencies": {
     "hyperlog": "^4.12.1",
+    "levelup": "^2.0.1",
     "osm-p2p-db": "^4.2.5"
   },
   "author": "Stephen Whitmore <sww@eight45.net>",
