@@ -64,6 +64,7 @@ function benchmark (level, chunk, opts, cb) {
             replicate(function () {
               res.push(timer.end())
               res.push(timer.total())
+              res.numNodes = n
               cb(null, res)
             })
           })
