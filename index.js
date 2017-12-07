@@ -2,10 +2,12 @@ var hyperlog = require('hyperlog')
 var osmdb = require('osm-p2p-db')
 var createPerfTimer = require('./lib/app_timer')
 
-module.exports = benchmark
+module.exports = {
+  random: benchmarkRandom
+}
 
-function benchmark (level, chunk, opts, cb) {
-  if (typeof opts == 'function') {
+function benchmarkRandom (level, chunk, opts, cb) {
+  if (typeof opts === 'function') {
     cb = opts
     opts = {}
   }
