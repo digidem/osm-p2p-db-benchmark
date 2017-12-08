@@ -4,6 +4,7 @@ var createPerfTimer = require('./lib/app_timer')
 var path = require('path')
 var nineSquare = require('./lib/9-square')
 var meanNode = require('./lib/mean-node')
+var tmpdir = require('os').tmpdir
 
 module.exports = {
   random: benchmarkRandom,
@@ -21,24 +22,22 @@ function benchmarkDb (dbPath, opts, cb) {
 
   var osm = osmdb({
     log: hyperlog(level(path.join(dbPath, 'log')), { valueEncoding: 'json' }),
-    // TODO: create tempfile index
-    db: level(path.join(dbPath, 'index')),
-    // TODO: create tempfile kdb
-    store: chunk(4096, path.join(dbPath, 'kdb'))
+    db: level(path.join(tmpdir(), 'index' + Math.random().toString())),
+    store: chunk(4096, path.join(tmpdir(), 'kdb' + Math.random().toString())),
   })
 
   var timer = createPerfTimer(level, chunk)
   var res = []
 
-  process.stdout.write('Computing rough center of dataset..')
-  meanNode(osm, function (err, lat, lon) {
-    console.log('..done (' + lat + ', ' + lon + ')')
+  process.stdout.write('Indexing..')
+  timer.start('index')
+  osm.ready(function () {
+    console.log('..done')
+    res.push(timer.end())
 
-    process.stdout.write('Indexing..')
-    timer.start('index')
-    osm.ready(function () {
-      console.log('..done')
-      res.push(timer.end())
+    process.stdout.write('Computing rough center of dataset..')
+    meanNode(osm, function (err, lat, lon) {
+      console.log('..done (' + lat + ', ' + lon + ')')
 
       process.stdout.write('Huge query..')
       timer.start('huge-query')
