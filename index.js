@@ -3,6 +3,7 @@ var osmdb = require('osm-p2p-db')
 var createPerfTimer = require('./lib/app_timer')
 var path = require('path')
 var nineSquare = require('./lib/9-square')
+var meanNode = require('./lib/mean-node')
 
 module.exports = {
   random: benchmarkRandom,
@@ -29,17 +30,25 @@ function benchmarkDb (dbPath, opts, cb) {
   var timer = createPerfTimer(level, chunk)
   var res = []
 
-  timer.start('index')
-  osm.ready(function () {
-    res.push(timer.end())
+  process.stdout.write('Computing rough center of dataset..')
+  meanNode(osm, function (err, lat, lon) {
+    console.log('..done (' + lat + ', ' + lon + ')')
 
-    timer.start('huge-query')
-    nineSquare(osm, 0, 0, 40, function (err, results) {
-      console.log(err || results.length)
+    process.stdout.write('Indexing..')
+    timer.start('index')
+    osm.ready(function () {
+      console.log('..done')
       res.push(timer.end())
-      res.push(timer.total())
-      res.db = dbPath
-      cb(null, res)
+
+      process.stdout.write('Huge query..')
+      timer.start('huge-query')
+      nineSquare(osm, 0, 0, 40, function (err, results) {
+        console.log('..done')
+        res.push(timer.end())
+        res.push(timer.total())
+        res.db = dbPath
+        cb(null, res)
+      })
     })
   })
 }
