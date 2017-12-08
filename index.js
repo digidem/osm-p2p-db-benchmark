@@ -39,14 +39,36 @@ function benchmarkDb (dbPath, opts, cb) {
     meanNode(osm, function (err, lat, lon) {
       console.log('..done (' + lat + ', ' + lon + ')')
 
-      process.stdout.write('Huge query..')
-      timer.start('huge-query')
-      nineSquare(osm, 0, 0, 40, function (err, results) {
+      process.stdout.write('Zoom-16 query..')
+      timer.start('zoom-16-query')
+      nineSquare(osm, 0, 0, 0.005, function (err, results) {
         console.log('..done')
         res.push(timer.end())
-        res.push(timer.total())
-        res.db = dbPath
-        cb(null, res)
+
+        process.stdout.write('Zoom-13 query..')
+        timer.start('zoom-13-query')
+        nineSquare(osm, 0, 0, 0.044, function (err, results) {
+          console.log('..done')
+          res.push(timer.end())
+
+          process.stdout.write('Zoom-9 query..')
+          timer.start('zoom-9-query')
+          nineSquare(osm, 0, 0, 0.703, function (err, results) {
+            console.log('..done')
+            res.push(timer.end())
+
+            process.stdout.write('Full map query..')
+            timer.start('full-map-query')
+            fullMapQuery(osm, function (err) {
+              console.log('..done')
+              res.push(timer.end())
+
+              res.push(timer.total())
+              res.db = dbPath
+              cb(null, res)
+            })
+          })
+        })
       })
     })
   })
@@ -135,4 +157,15 @@ function benchmarkRandom (level, chunk, opts, cb) {
       if (!--pending) cb()
     }
   }
+}
+
+function fullMapQuery (osm, cb) {
+  var bbox = [
+    [-85, 85],
+    [-180, 180]
+  ]
+  var qs = osm.queryStream(bbox)
+  qs.on('data', function () {})
+  qs.once('error', cb)
+  qs.once('end', cb)
 }
