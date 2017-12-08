@@ -20,6 +20,7 @@
     "openstreetmap"
   ],
   "dependencies": {
+    "async": "^2.6.0",
     "hyperlog": "^4.12.1",
     "osm-p2p-db": "^4.2.5"
   },

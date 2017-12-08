@@ -2,6 +2,7 @@ var hyperlog = require('hyperlog')
 var osmdb = require('osm-p2p-db')
 var createPerfTimer = require('./lib/app_timer')
 var path = require('path')
+var nineSquare = require('./lib/9-square')
 
 module.exports = {
   random: benchmarkRandom,
@@ -32,11 +33,9 @@ function benchmarkDb (dbPath, opts, cb) {
   osm.ready(function () {
     res.push(timer.end())
 
-    timer.start('full-query')
-    var qs = osm.queryStream([[-90, 90], [-180, 180]])
-    qs.on('data', function () {})
-    qs.once('error', cb)
-    qs.once('end', function () {
+    timer.start('huge-query')
+    nineSquare(osm, 0, 0, 40, function (err, results) {
+      console.log(err || results.length)
       res.push(timer.end())
       res.push(timer.total())
       res.db = dbPath
