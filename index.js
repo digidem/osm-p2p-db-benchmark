@@ -1,9 +1,48 @@
 var hyperlog = require('hyperlog')
 var osmdb = require('osm-p2p-db')
 var createPerfTimer = require('./lib/app_timer')
+var path = require('path')
 
 module.exports = {
-  random: benchmarkRandom
+  random: benchmarkRandom,
+  db: benchmarkDb
+}
+
+function benchmarkDb (dbPath, opts, cb) {
+  if (typeof opts === 'function') {
+    cb = opts
+    opts = {}
+  }
+
+  var level = require('level')
+  var chunk = require('fd-chunk-store')
+
+  var osm = osmdb({
+    log: hyperlog(level(path.join(dbPath, 'log')), { valueEncoding: 'json' }),
+    // TODO: create tempfile index
+    db: level(path.join(dbPath, 'index')),
+    // TODO: create tempfile kdb
+    store: chunk(4096, path.join(dbPath, 'kdb'))
+  })
+
+  var timer = createPerfTimer(level, chunk)
+  var res = []
+
+  timer.start('index')
+  osm.ready(function () {
+    res.push(timer.end())
+
+    timer.start('full-query')
+    var qs = osm.queryStream([[-90, 90], [-180, 180]])
+    qs.on('data', function () {})
+    qs.once('error', cb)
+    qs.once('end', function () {
+      res.push(timer.end())
+      res.push(timer.total())
+      res.db = dbPath
+      cb(null, res)
+    })
+  })
 }
 
 function benchmarkRandom (level, chunk, opts, cb) {

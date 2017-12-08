@@ -48,6 +48,12 @@ Valid `opts` include:
 
 - `n` (Number): the number of nodes to insert to benchmark against
 
+### benchmark.db(dbPath, cb)
+
+Use an exising osm-p2p database (directory with `log`, `index`, `kdb`), and run
+benchmarks against it. `cb` is called with `(err, res)`, where `res` are the
+timing results shown in the above example output.
+
 ## License
 
 ISC
