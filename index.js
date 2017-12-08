@@ -29,38 +29,38 @@ function benchmarkDb (dbPath, opts, cb) {
   var timer = createPerfTimer(level, chunk)
   var res = []
 
-  process.stdout.write('Indexing..')
+  process.stderr.write('Indexing..')
   timer.start('index')
   osm.ready(function () {
-    console.log('..done')
+    console.error('..done')
     res.push(timer.end())
 
-    process.stdout.write('Computing rough center of dataset..')
+    process.stderr.write('Computing rough center of dataset..')
     meanNode(osm, function (err, lat, lon) {
-      console.log('..done (' + lat + ', ' + lon + ')')
+      console.error('..done (' + lat + ', ' + lon + ')')
 
-      process.stdout.write('Zoom-16 query..')
+      process.stderr.write('Zoom-16 query..')
       timer.start('zoom-16-query')
-      nineSquare(osm, 0, 0, 0.005, function (err, results) {
-        console.log('..done')
+      nineSquare(osm, lat, lon, 0.005, function (err, numResults) {
+        console.error('..done (' + numResults + ')')
         res.push(timer.end())
 
-        process.stdout.write('Zoom-13 query..')
+        process.stderr.write('Zoom-13 query..')
         timer.start('zoom-13-query')
-        nineSquare(osm, 0, 0, 0.044, function (err, results) {
-          console.log('..done')
+        nineSquare(osm, lat, lon, 0.044, function (err, numResults) {
+          console.error('..done (' + numResults + ')')
           res.push(timer.end())
 
-          process.stdout.write('Zoom-9 query..')
+          process.stderr.write('Zoom-9 query..')
           timer.start('zoom-9-query')
-          nineSquare(osm, 0, 0, 0.703, function (err, results) {
-            console.log('..done')
+          nineSquare(osm, lat, lon, 0.703, function (err, numResults) {
+            console.error('..done (' + numResults + ')')
             res.push(timer.end())
 
-            process.stdout.write('Full map query..')
+            process.stderr.write('Full map query..')
             timer.start('full-map-query')
             fullMapQuery(osm, function (err) {
-              console.log('..done')
+              console.error('..done')
               res.push(timer.end())
 
               res.push(timer.total())
