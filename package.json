@@ -1,6 +1,6 @@
 {
   "name": "osm-p2p-db-benchmark",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A performance benchmarking suite for osm-p2p-db.",
   "main": "index.js",
   "scripts": {
