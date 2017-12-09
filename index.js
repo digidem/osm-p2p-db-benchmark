@@ -23,7 +23,7 @@ function benchmarkDb (dbPath, opts, cb) {
   var osm = osmdb({
     log: hyperlog(level(path.join(dbPath, 'log')), { valueEncoding: 'json' }),
     db: level(path.join(tmpdir(), 'index' + Math.random().toString())),
-    store: chunk(4096, path.join(tmpdir(), 'kdb' + Math.random().toString())),
+    store: chunk(4096, path.join(tmpdir(), 'kdb' + Math.random().toString()))
   })
 
   var timer = createPerfTimer(level, chunk)
@@ -80,35 +80,41 @@ function benchmark (osm, timer, res, cb) {
 
     process.stderr.write('Computing rough center of dataset..')
     meanNode(osm, function (err, lat, lon) {
+      if (err) return cb(err)
       console.error('..done (' + lat + ', ' + lon + ')')
 
       process.stderr.write('Zoom-16 query..')
       timer.start('zoom-16-query')
       nineSquare(osm, lat, lon, 0.005, function (err, numResults) {
+        if (err) return cb(err)
         console.error('..done (' + numResults + ')')
         res.push(timer.end())
 
         process.stderr.write('Zoom-13 query..')
         timer.start('zoom-13-query')
         nineSquare(osm, lat, lon, 0.044, function (err, numResults) {
+          if (err) return cb(err)
           console.error('..done (' + numResults + ')')
           res.push(timer.end())
 
           process.stderr.write('Zoom-11 query..')
           timer.start('zoom-11-query')
           nineSquare(osm, lat, lon, 0.176, function (err, numResults) {
+            if (err) return cb(err)
             console.error('..done (' + numResults + ')')
             res.push(timer.end())
 
             process.stderr.write('Full map query..')
             timer.start('full-map-query')
             fullMapQuery(osm, function (err) {
+              if (err) return cb(err)
               console.error('..done')
               res.push(timer.end())
 
               process.stderr.write('Replicate to new DB..')
               timer.start('replication')
               replicateToTempDb(osm, function (err) {
+                if (err) return cb(err)
                 console.error('..done')
                 res.push(timer.end())
 
