@@ -28,7 +28,50 @@ function benchmarkDb (dbPath, opts, cb) {
 
   var timer = createPerfTimer(level, chunk)
   var res = []
+  res.db = dbPath
 
+  benchmark(osm, timer, res, opts, cb)
+}
+
+function benchmarkRandom (level, chunk, opts, cb) {
+  if (typeof opts === 'function') {
+    cb = opts
+    opts = {}
+  }
+
+  var timer = createPerfTimer(level, chunk)
+  var res = []
+
+  var osm = osmdb({
+    log: hyperlog(level('log1'), { valueEncoding: 'json' }),
+    db: level('index1'),
+    store: chunk(4096, 'kdb1')
+  })
+
+  timer.start('insert')
+  var batch = []
+  var n = opts.n || 100
+  var r = Math.min(1, n / 500000)
+  res.numNodes = n
+  process.stderr.write('Inserting', n, 'documents..')
+  for (var i = 0; i < n; i++) {
+    var node = {
+      type: 'node',
+      lat: Math.random() * 180 * r - 90 * r,
+      lon: Math.random() * 360 * r - 180 * r
+    }
+    batch.push({ type: 'put', key: '' + i, value: node })
+  }
+  osm.batch(batch, function (err) {
+    if (err) throw err
+    console.error('..done')
+    res.push(timer.end())
+
+    benchmark(osm, timer, res, cb)
+  })
+}
+
+function benchmark (osm, timer, res, cb) {
   process.stderr.write('Indexing..')
   timer.start('index')
   osm.ready(function () {
@@ -70,79 +113,8 @@ function benchmarkDb (dbPath, opts, cb) {
                 res.push(timer.end())
 
                 res.push(timer.total())
-                res.db = dbPath
                 cb(null, res)
               })
-            })
-          })
-        })
-      })
-    })
-  })
-}
-
-function benchmarkRandom (level, chunk, opts, cb) {
-  if (typeof opts === 'function') {
-    cb = opts
-    opts = {}
-  }
-
-  var timer = createPerfTimer(level, chunk)
-  var res = []
-
-  var osm = osmdb({
-    log: hyperlog(level('log1'), { valueEncoding: 'json' }),
-    db: level('index1'),
-    store: chunk(4096, 'kdb1')
-  })
-
-  var osm2 = osmdb({
-    log: hyperlog(level('log2'), { valueEncoding: 'json' }),
-    db: level('index2'),
-    store: chunk(4096, 'kdb2')
-  })
-
-  timer.start('insert')
-  var batch = []
-  var n = opts.n || 100
-  console.error('inserting', n, 'documents')
-  for (var i = 0; i < n; i++) {
-    var node = {
-      type: 'node',
-      lat: Math.random() * 180 - 90,
-      lon: Math.random() * 360 - 180
-    }
-    batch.push({ type: 'put', key: '' + i, value: node })
-  }
-  osm.batch(batch, function (err) {
-    if (err) throw err
-    res.push(timer.end())
-
-    timer.start('index')
-    osm.ready(function () {
-      res.push(timer.end())
-
-      timer.start('small-query')
-      osm.query([[-10, 10], [-20, 20]], function (err) {
-        if (err) throw err
-        res.push(timer.end())
-
-        timer.start('medium-query')
-        osm.query([[-45, 45], [-90, 90]], function (err) {
-          if (err) throw err
-          res.push(timer.end())
-
-          timer.start('full-query')
-          osm.query([[-90, 90], [-180, 180]], function (err) {
-            if (err) throw err
-            res.push(timer.end())
-
-            timer.start('replicate')
-            replicate(osm, osm2, function () {
-              res.push(timer.end())
-              res.push(timer.total())
-              res.numNodes = n
-              cb(null, res)
             })
           })
         })
